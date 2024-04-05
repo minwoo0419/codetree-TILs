@@ -91,6 +91,11 @@ int main() {
             temp = -1;
         turn_dice(temp);
         idx += temp;
+        if (idx < 0){
+            idx += 4;
+        } else if (idx >= 4){
+            idx -= 4;
+        }
         check_run(x, y, idx);
         run_dice();
         sum += bfs(x, y);
