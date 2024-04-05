@@ -15,20 +15,22 @@ int garo[2] = {2, 5};
 void turn_dice(int a){
     if (a == 0)
         return;
-    int temp = 0;
     int first = (a == 1) ? 0 : 1;
     int second = (a == 1) ? 1 : 0;
-    temp = sero[1];
+    int temp1 = sero[1];
+    int temp2 = sero[3];
     sero[1] = garo[first];
-    garo[first] = temp;
-    temp = sero[3];
+    garo[first] = temp2;
     sero[3] = garo[second];
-    garo[second] = temp;
+    garo[second] = temp1;
 }
 void back_dice(){
     int temp = sero[1];
     sero[1] = sero[3];
     sero[3] = temp;
+    temp = garo[0];
+    garo[0] = garo[1];
+    garo[1] = temp;
 }
 void run_dice(){
     int temp = sero[3];
@@ -42,19 +44,20 @@ int bfs(int i, int j){
     vector< vector<int> > visit(n, vector<int>(n, 0));
     q.push(make_pair(i, j));
     int sum = 0;
+    visit[i][j] = 1;
+    sum += map[i][j];
     while(!q.empty()){
         int x = q.front().first;
         int y = q.front().second;
-        visit[x][y] = 1;
-        int num = map[x][y];
-        sum += num;
         q.pop();
         for (int k = 0 ; k < 4 ; k++){
             int nx = x + dx[k];
             int ny = y + dy[k];
             if (nx >= 0 && nx < n && ny >= 0 && ny < n){
-                if (num == map[nx][ny] && visit[nx][ny] == 0){
+                if (map[x][y] == map[nx][ny] && visit[nx][ny] == 0){
                     q.push(make_pair(nx, ny));
+                    visit[nx][ny] = 1;
+                    sum += map[nx][ny];
                 }
             }
         }
