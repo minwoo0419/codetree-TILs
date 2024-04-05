@@ -142,15 +142,6 @@ int main() {
     for (int q = 0 ; q < t ; q++){
         copy_monster();
         move_monster();
-        // for (int i = 0 ; i < 4 ; i++){
-        //     for (int j = 0 ; j < 4 ; j++){
-        //         if (!monster[i][j].empty())
-        //             cout << "\nxy : " << i << " " << j << "\n";
-        //         for (int k = 0 ; k < monster[i][j].size() ; k++){
-        //             cout << monster[i][j][k] << " ";
-        //         }
-        //     }
-        // }
         move_pacman();
         checks_dead();
         birth_egg();
