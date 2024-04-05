@@ -32,7 +32,7 @@ void move_monster(){
                 int p = 0;
                 for (; p < 8 ; p++){
                     int index = idx + p;
-                    if (index == 8)
+                    if (index >= 8)
                             index -= 8;
                     int nx = i + dx[index];
                     int ny = j + dy[index];
