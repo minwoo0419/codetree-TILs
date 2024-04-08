@@ -71,18 +71,15 @@ void reproduce(){
 void check_dead(){
     for (int i = 0 ; i < n ; i++){
         for (int j = 0 ; j < n ; j++){
-            if (dead[i][j] == 0)
-                continue;
-            if (dead[i][j] > c)
-                dead[i][j] = 0;
-            else
-                dead[i][j] += 1;
+            if (dead[i][j] > 0)
+                dead[i][j] -= 1;
         }
     }
 }
 pair<int, vector< pair<int, int> > > check_weed(int x, int y){
-    int count = 0;
+    int count = tree[x][y];
     vector< pair<int, int> > point;
+    point.push_back(make_pair(x, y));
     int dx[4] = {1, 1, -1, -1};
     int dy[4] = {-1, 1, -1, 1};
     for (int i = 0 ; i < 4 ; i++){
@@ -91,10 +88,11 @@ pair<int, vector< pair<int, int> > > check_weed(int x, int y){
             int ny = y + dy[i] * j;
             if (nx < 0 || nx >= n || ny < 0 || ny >= n)
                 continue;
+            if (tree[nx][ny] != -1)
+                count += tree[nx][ny];
+            point.push_back(make_pair(nx, ny));
             if (tree[nx][ny] <= 0)
                 break;
-            count += tree[nx][ny];
-            point.push_back(make_pair(nx, ny));
 
         }
     }
@@ -108,16 +106,15 @@ int weed(){
             if (tree[i][j] <= 0)
                 continue;
             pair<int, vector< pair<int, int> > > temp = check_weed(i, j);
-            if (sum < temp.first + tree[i][j]){
-                sum = temp.first + tree[i][j];
+            if (sum < temp.first){
+                sum = temp.first;
                 point = temp.second;
-                point.push_back(make_pair(i, j));
             }
         }
     }
     for(int i = 0 ; i < point.size() ; i++){
         tree[point[i].first][point[i].second] = 0;
-        dead[point[i].first][point[i].second] = 1;
+        dead[point[i].first][point[i].second] = c;
     }
     return sum;
 }
@@ -142,8 +139,8 @@ int main() {
     for (int i = 0 ; i < m ; i++){
         grow();
         reproduce();
-        sum += weed();
         check_dead();
+        sum += weed();
     }
     cout << sum;
     return 0;
