@@ -5,46 +5,45 @@
 #include <queue>
 #include <stack>
 #include <algorithm>
+#include <numeric>
 using namespace std;
 int m, t, r, c;
-vector< vector< vector <int> > > monster(4, vector< vector <int> >(4, vector<int>(0)));
-vector< vector< vector <int> > > egg(4, vector< vector <int> >(4, vector<int>(0)));
+vector< vector< vector <int> > > monster(4, vector< vector <int> >(4, vector<int>(8, 0)));
+vector< vector< vector <int> > > egg(4, vector< vector <int> >(4, vector<int>(8, 0)));
 vector< vector< vector <int> > > dead(4, vector< vector <int> >(4, vector<int>(0)));
 int dx[8] = {-1, -1, 0, 1, 1, 1, 0, -1};
 int dy[8] = {0, -1, -1, -1, 0, 1, 1, 1};
 void copy_monster(){
-    vector< vector< vector < int > > > temp(4, vector< vector < int > >(4, vector< int >(0)));
-    for (int i = 0 ; i < 4 ; i++){
-        for (int j = 0 ; j < 4 ; j++){
-            for (int k = 0 ; k < monster[i][j].size() ; k++){
-                temp[i][j].push_back(monster[i][j][k]);
-            }
-        }
-    }
+    vector< vector< vector < int > > > temp(4, vector< vector < int > >(4, vector< int >(8, 0)));
+    temp = monster;
     egg = temp;
 }
 void move_monster(){
-    vector< vector< vector < int > > > temp(4, vector< vector < int > >(4, vector< int >(0)));
+    vector< vector< vector < int > > > temp(4, vector< vector < int > >(4, vector< int >(8, 0)));
     for (int i = 0 ; i < 4 ; i++){
         for (int j = 0 ; j < 4 ; j++){
-            for (int k = 0 ; k < monster[i][j].size() ; k++){
-                int idx = monster[i][j][k];
+            for (int k = 0 ; k < 8 ; k++){
+                int idx = k;
                 int p = 0;
+                int nx = i;
+                int ny = j;
                 for (; p < 8 ; p++){
                     int index = idx + p;
                     if (index >= 8)
                             index -= 8;
-                    int nx = i + dx[index];
-                    int ny = j + dy[index];
+                    nx = i + dx[index];
+                    ny = j + dy[index];
                     if (nx < 0 || nx >= 4 || ny < 0 || ny >= 4)
                         continue;
                     if ((nx == r && ny == c) || (!dead[nx][ny].empty()))
                         continue;
-                    temp[nx][ny].push_back(index);
+                    idx = index;
                     break;
                 }
                 if (p == 8)
-                    temp[i][j].push_back(monster[i][j][k]);
+                    temp[i][j][k] += monster[i][j][k];
+                else
+                    temp[nx][ny][idx] += monster[i][j][k];
             }
         }
     }
@@ -81,7 +80,7 @@ void move_pacman(){
                     int ny = temp[q].second;
                     if (visit[nx][ny])
                         continue;
-                    temp_cnt += monster[nx][ny].size();
+                    temp_cnt += accumulate(monster[nx][ny].begin(), monster[nx][ny].end(), 0);
                     visit[nx][ny] = 1;
                 }
                 if (temp_cnt > cnt){
@@ -95,8 +94,8 @@ void move_pacman(){
     for (int i = 0 ; i < point.size() ; i++){
         int nx = point[i].first;
         int ny = point[i].second;
-        while(!monster[nx][ny].empty()){
-            monster[nx][ny].erase(monster[nx][ny].begin());
+        for (int j = 0 ; j < 8 ; j++){
+            monster[nx][ny][j] = 0;
             dead[nx][ny].push_back(0);
         }
         x = nx;
@@ -122,10 +121,9 @@ void checks_dead(){
 void birth_egg(){
     for (int i = 0 ; i < 4 ; i++){
         for (int j = 0 ; j < 4 ; j++){
-            for (int k = 0 ; k < egg[i][j].size() ; k++){
-                monster[i][j].push_back(egg[i][j][k]);
-                egg[i][j].erase(egg[i][j].begin() + k);
-                k--;
+            for (int k = 0 ; k < 8 ; k++){
+                monster[i][j][k] += egg[i][j][k];
+                egg[i][j][k] = 0;
             }
         }
     }
@@ -138,10 +136,18 @@ int main() {
     for (int i = 0 ; i < m ; i++){
         int a, b, c;
         cin >> a >> b >> c;
-        monster[a-1][b-1].push_back(c-1);
+        monster[a-1][b-1][c-1] += 1;
     }
     for (int q = 0 ; q < t ; q++){
         copy_monster();
+        // cout << "\n";
+        // for (int i = 0 ; i < 4 ; i++){
+        //     for (int j = 0 ; j < 4 ; j++){
+        //         int ab = accumulate(monster[i][j].begin(), monster[i][j].end(), 0);
+        //         if (ab)
+        //             cout <<  i << " " << j <<  " " << ab<< "\n";
+        //     }
+        // }
         move_monster();
         move_pacman();
         checks_dead();
@@ -150,7 +156,7 @@ int main() {
     int sum = 0;
     for (int i = 0 ; i < 4 ; i++){
         for (int j = 0 ; j < 4 ; j++){
-            sum += monster[i][j].size();
+            sum += accumulate(monster[i][j].begin(), monster[i][j].end(), 0);
         }
     }
     cout << sum;
