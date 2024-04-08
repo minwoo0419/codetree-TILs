@@ -53,7 +53,7 @@ void move_monster(){
 void move_pacman(){
     int px[4] = {0, 1, 0, -1};
     int py[4] = {1, 0, -1, 0};
-    int cnt = 0;
+    int cnt = -1;
     vector< pair<int, int> > point;
     for (int i = 0 ; i < 4 ; i++){
         int ax = r + px[i];
@@ -84,7 +84,7 @@ void move_pacman(){
                     temp_cnt += monster[nx][ny].size();
                     visit[nx][ny] = 1;
                 }
-                if (temp_cnt >= cnt){
+                if (temp_cnt > cnt){
                     cnt = temp_cnt;
                     point = temp;
                 }
