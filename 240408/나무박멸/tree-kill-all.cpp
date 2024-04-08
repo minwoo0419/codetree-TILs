@@ -58,6 +58,8 @@ void reproduce(){
             if (tree[i][j] <= 0)
                 continue;
             pair<int, vector< pair<int, int> > > temp = check_near_blank(i, j);
+            if (temp.first == 0)
+                continue;
             int plus = tree[i][j] / temp.first;
             for (int w = 0 ; w < temp.second.size() ; w++){
                 temp_tree[temp.second[w].first][temp.second[w].second] += plus;
