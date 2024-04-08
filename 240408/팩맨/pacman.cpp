@@ -51,8 +51,8 @@ void move_monster(){
     monster = temp;
 }
 void move_pacman(){
-    int px[4] = {0, 1, 0, -1};
-    int py[4] = {1, 0, -1, 0};
+    int px[4] = {-1, 0, 1, 0};
+    int py[4] = {0, -1, 0, 1};
     int cnt = -1;
     vector< pair<int, int> > point;
     for (int i = 0 ; i < 4 ; i++){
@@ -97,6 +97,7 @@ void move_pacman(){
         int ny = point[i].second;
         while(!monster[nx][ny].empty()){
             monster[nx][ny].erase(monster[nx][ny].begin());
+            dead[nx][ny].push_back(0);
         }
         x = nx;
         y = ny;
@@ -108,7 +109,7 @@ void checks_dead(){
     for (int i = 0 ; i < 4 ; i++){
         for (int j = 0 ; j < 4 ; j++){
             for (int k = 0 ; k < dead[i][j].size() ; k++){
-                if (dead[i][j][k] == 1){
+                if (dead[i][j][k] == 2){
                     dead[i][j].erase(dead[i][j].begin() + k);
                     k--;
                 } else {
