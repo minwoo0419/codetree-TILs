@@ -83,8 +83,8 @@ void move_teams(){
     }
 }
 int throw_ball(int rounds){
-    int way = rounds / 4;
-    int idx = rounds % 8;
+    int way = rounds / n;
+    int idx = rounds % n;
     int x = 0, y = 0;
     int find = -1;
     if (way % 4 == 0){
@@ -118,6 +118,23 @@ int throw_ball(int rounds){
     }
     return find;
 }
+// void print_score(){
+//     cout << "score : ";
+//     for (int i = 0 ; i < score.size() ; i++){
+//         cout << score[i] << " ";
+//     }
+//     cout << "\n";
+// }
+// void print_map(){
+//     cout << "======map========\n";
+//     for (int i = 0 ; i < n ; i++){
+//         for (int j = 0 ; j < n ; j++){
+//             cout << map[i][j] << " ";
+//         }
+//         cout << "\n";
+//     }
+//     cout << "=================\n";
+// }
 int main() {
     cin >> n >> m >> k;
     for (int i = 0 ; i < n ; i++){
