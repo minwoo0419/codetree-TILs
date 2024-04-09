@@ -11,24 +11,26 @@ using namespace std;
 int n, m, k;
 vector< vector<int> > map(20, vector<int>(20, 0));
 vector< vector< pair<int, int> > > teams(5, vector< pair<int, int> >(0));
-vector< int> score(5, 0);
+vector<int> tails(5, 0);
+int score = 0; 
 int dx[4] = {0, -1, 0, 1};
 int dy[4] = {1, 0, -1, 0};
 int indexx = 0;
 void init_team(int x, int y, vector< vector<int> > &visit, int idx){
     visit[x][y] = 1;
     teams[idx].push_back(make_pair(x, y));
-    if (map[x][y] == 3)
-        return;
     for (int i = 0 ; i < 4 ; i++){
         int nx = x + dx[i];
         int ny = y + dy[i];
         if (nx < 0 || nx >= n || ny < 0 || ny >= n)
             continue;
-        if (visit[nx][ny] || (map[nx][ny] == 0 || map[nx][ny] == 4))
+        if (map[x][y] == 1 && map[nx][ny] != 2)
             continue;
-        if (map[nx][ny] <= map[x][y] + 1)
-            init_team(nx, ny, visit, idx);
+        if (visit[nx][ny] || map[nx][ny] == 0)
+            continue;
+        if (map[nx][ny] == 3)
+            tails[idx] = teams[idx].size();
+        init_team(nx, ny, visit, idx);
     }
 }
 void init_teams(){
@@ -44,27 +46,31 @@ void init_teams(){
         }
     }
 }
-void reverse_team(vector< pair<int, int> > &team){
-    map[team[0].first][team[0].second] = 3;
-    map[team[team.size()-1].first][team[team.size()-1].second] = 1;
-    reverse(team.begin(), team.end());
+void reverse_team(vector< pair<int, int> > &team, int idx){
+    vector< pair<int, int> > temp_team;
+    for(int i = tails[idx] ; i >= 0 ; i--){
+        temp_team.push_back(team[i]);
+    }
+    for (int i = team.size() - 1 ; i > tails[idx] ; i--){
+        temp_team.push_back(team[i]);
+    }
+    team = temp_team;
+    for (int i = 0 ; i < team.size() ; i++){
+        if (i == 0)
+            map[team[i].first][team[i].second] = 1;
+        else if (i < tails[idx])
+            map[team[i].first][team[i].second] = 2;
+        else if (i == tails[idx])
+            map[team[i].first][team[i].second] = 3;
+        else
+            map[team[i].first][team[i].second] = 4;
+    }
 }
-void move_team(vector< pair<int, int> > &team){
+void move_team(vector< pair<int, int> > &team, int idx){
     int x = 0, y = 0;
     vector< pair<int, int> > temp_team;
-    map[team[team.size()-1].first][team[team.size()-1].second] = 4;
-    x = team[0].first;
-    y = team[0].second;
-    for (int i = 0 ; i < 4 ; i++){
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-        if (nx < 0 || nx >= n || ny < 0 || ny >= n)
-            continue;
-        if (map[nx][ny] == 4){
-            temp_team.push_back(make_pair(nx, ny));
-            break;
-        }
-    }
+    pair<int, int> last = team[team.size() - 1];
+    temp_team.push_back(last);
     for (int i = 0 ; i < team.size() - 1 ; i++){
         temp_team.push_back(team[i]);
     }
@@ -72,15 +78,17 @@ void move_team(vector< pair<int, int> > &team){
     for (int i = 0 ; i < team.size() ; i++){
         if (i == 0)
             map[team[i].first][team[i].second] = 1;
-        else if (i == team.size()-1)
+        else if (i < tails[idx])
+            map[team[i].first][team[i].second] = 2;
+        else if (i == tails[idx])
             map[team[i].first][team[i].second] = 3;
         else
-            map[team[i].first][team[i].second] = 2;
+            map[team[i].first][team[i].second] = 4;
     }
 }
 void move_teams(){
     for (int i = 0 ; i < indexx ; i++){
-        move_team(teams[i]);
+        move_team(teams[i], i);
     }
 }
 int throw_ball(int rounds){
@@ -114,19 +122,21 @@ int throw_ball(int rounds){
         for (int j = 0 ; j < teams[i].size() ; j++){
             if (teams[i][j].first == x && teams[i][j].second == y){
                 find = i;
-                score[i] += pow(j+1, 2);
+                score += pow(j+1, 2);
                 return find;
             }
         }
     }
     return find;
 }
-// void print_score(){
-//     cout << "score : ";
-//     for (int i = 0 ; i < score.size() ; i++){
-//         cout << score[i] << " ";
+// void print_teams(){
+//     cout << "==============print teams=============\n";
+//     for (int i = 0 ; i < indexx ; i++){
+//         for (int j = 0 ; j < teams[i].size() ; j++){
+//             cout << teams[i][j].first << " " << teams[i][j].second << ", ";
+//         }
+//         cout << "\n";
 //     }
-//     cout << "\n";
 // }
 // void print_map(){
 //     cout << "======map========\n";
@@ -148,17 +158,18 @@ int main() {
     init_teams();
     for (int i = 0 ; i < k ; i++){
         // cout << "\n=============실행==============\n";
+        // print_teams();
         // print_map();
         move_teams();
         // print_map();
         int idx = throw_ball(i);
         if (idx >= 0){
             // cout << "맞은 사람의 팀 : " << idx << "\n";
-            reverse_team(teams[idx]);
+            reverse_team(teams[idx], idx);
         }
         // print_map();
-        // print_score();
+        // cout << "score : " << score << "\n";
     }
-    cout << accumulate(score.begin(), score.end(), 0);
+    cout << score;
     return 0;
 }
