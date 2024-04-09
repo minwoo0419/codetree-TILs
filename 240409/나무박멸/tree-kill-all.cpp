@@ -92,8 +92,9 @@ pair<int, vector< pair<int, int> > > check_weed(int x, int y){
             int ny = y + dy[i] * j;
             if (nx < 0 || nx >= n || ny < 0 || ny >= n)
                 continue;
-            if (tree[nx][ny] != -1)
-                count += tree[nx][ny];
+            if (tree[nx][ny] == -1)
+                break;
+            count += tree[nx][ny];
             point.push_back(make_pair(nx, ny));
             if (tree[nx][ny] <= 0)
                 break;
