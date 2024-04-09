@@ -84,14 +84,12 @@ void move_teams(){
 int throw_ball(int rounds){
     int way = rounds / n;
     int idx = rounds % n;
-    // cout << "throw_ball's round : " << way << " " << idx << "\n";
     int x = 0, y = 0;
     if (way % 4 == 0){
         x = idx;
         y = 0;
-        for (int i = y ; y < n ; y++){
+        for (; y < n ; y++){
             if (map[x][y] >= 1 && map [x][y] <= 3){
-                // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
                 for(int j = 0 ; j < teams[team_num[x][y]].size() ; j++){
                     if(teams[team_num[x][y]][j].first == x && teams[team_num[x][y]][j].second == y){
                         score += pow(j+1, 2);
@@ -104,9 +102,8 @@ int throw_ball(int rounds){
     } else if(way % 4 == 1){
         x = n - 1;
         y = idx;
-        for (int i = x ; i >= 0 ; i--){
+        for (; x >= 0 ; x--){
             if (map[x][y] >= 1 && map [x][y] <= 3){
-                // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
                 for(int j = 0 ; j < teams[team_num[x][y]].size() ; j++){
                     if(teams[team_num[x][y]][j].first == x && teams[team_num[x][y]][j].second == y){
                         score += pow(j+1, 2);
@@ -119,9 +116,8 @@ int throw_ball(int rounds){
     } else if (way % 4 == 2){
         x = n - 1 - idx;
         y = n - 1;
-        for (int i = y ; i >= 0 ; i--){
+        for (;y >= 0 ; y--){
             if (map[x][y] >= 1 && map [x][y] <= 3){
-                // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
                 for(int j = 0 ; j < teams[team_num[x][y]].size() ; j++){
                     if(teams[team_num[x][y]][j].first == x && teams[team_num[x][y]][j].second == y){
                         score += pow(j+1, 2);
@@ -134,9 +130,8 @@ int throw_ball(int rounds){
     } else if (way % 4 == 3){
         x = 0;
         y = n - 1 - idx;
-        for (int i = x ; i < n ; i++){
+        for (;x < n ; x++){
             if (map[x][y] >= 1 && map [x][y] <= 3){
-                // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
                 for(int j = 0 ; j < teams[team_num[x][y]].size() ; j++){
                     if(teams[team_num[x][y]][j].first == x && teams[team_num[x][y]][j].second == y){
                         score += pow(j+1, 2);
@@ -184,11 +179,9 @@ int main() {
         // print_map();
         int idx = throw_ball(i);
         if (idx >= 0){
-            // cout << "맞은 사람의 팀 : " << idx << "\n";
             reverse_team(teams[idx], idx);
         }
         // print_map();
-        // cout << "score : " << score << "\n";
     }
     cout << score;
     return 0;
