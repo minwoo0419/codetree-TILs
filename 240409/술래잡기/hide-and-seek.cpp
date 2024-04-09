@@ -13,16 +13,43 @@ int r, c;
 int dx[4] = {0, 1, 0, -1};
 int dy[4] = {1, 0, -1, 0};
 int sum = 0;
-int flag = 0;
-int rounds = 0;
+int is_rev = 0;
 vector< vector<int> > tree(100, vector<int>(100, 0));
 vector< vector< vector<int> > > people(100, vector< vector<int> >(100, vector<int>(4, 0)));
+vector< vector< int > > turn(100, vector<int>(100, 0));
+vector< vector< int > > rev_turn(100, vector<int>(100, 0));
+void init_turn(){
+    int tx[4] = {-1, 0, 1, 0};
+    int ty[4] = {0, 1, 0, -1};
+    int index = 0;
+    int x = (n + 1) / 2;
+    int y = (n + 1) / 2;
+    int flag = 1;
+    while(flag){
+        int rounds = index % 4;
+        for (int i = 0 ; i <= index / 2 ; i++){
+            turn[x][y] = rounds;
+            x += tx[rounds];
+            y += ty[rounds];
+            rev_turn[x][y] = (rounds + 2 >= 4) ? (rounds - 2) : (rounds + 2);
+            if (x < 1 || x > n || x < 1 || y > n){
+                flag = 0;
+                break;
+            }
+        }
+        index++;
+    }
+}
 void move_people(){
     vector< vector< vector<int> > > temp_people(100, vector< vector<int> >(100, vector<int>(4, 0)));
     for (int i = 1 ; i <= n ; i++){
         for (int j = 1 ; j <= n ; j++){
-            if (abs(i - r) + abs(j - c) > 3)
+            if (abs(i - r) + abs(j - c) > 3){
+                for (int t = 0 ; t < 4 ; t++){
+                    temp_people[i][j][t] += people[i][j][t];
+                }
                 continue;
+            }
             for (int t = 0 ; t < 4 ; t++){
                 if (people[i][j][t] == 0)
                     continue;
@@ -44,85 +71,8 @@ void move_people(){
     }
     people = temp_people;
 }
-void move_soolae(){
-    int sx[4] = {-1, 0, 1, 0};
-    int sy[4] = {0, 1, 0, -1};
-    int idx = rounds % 4;
-    for (int i = 0 ; i <= rounds / 2 ; i++){
-        if (i == n - 1){
-            flag = 1;
-            rounds += 1;
-            break;
-        }
-        r += sx[idx];
-        c += sy[idx];
-    }
-}
-void move_soolae_re(){
-    int sx[4] = {1, 0, -1, 0};
-    int sy[4] = {0, -1, 0, 1};
-    int idx = rounds % 4;
-    for (int i = 0 ; i <= rounds / 2 ; i++){
-        if (i == n - 1){
-            break;
-        }
-        r += sx[idx];
-        c += sy[idx];
-    }
-    if (r == (n+1) / 2 && c == (n+1) / 2){
-        flag = 0;
-        rounds -= 1;
-    }
-}
-int catch_people(){
-    int sx[4] = {-1, 0, 1, 0};
-    int sy[4] = {0, 1, 0, -1};
-    int idx = rounds % 4;
-    int x = r, y = c;
-    int temp = 0;
-    for (int i = 0 ; i < 3 ; i++){
-        if (x < 1 && x > n && y < 1 && y > n)
-            continue;
-        if (tree[x][y]){
-            x += sx[idx];
-            y += sy[idx];
-            continue;
-        }
-        for (int j = 0 ; j < 4 ; j++){
-            if(people[x][y][j] == 0)
-                continue;
-            temp += people[x][y][j];
-            people[x][y][j] = 0;
-        }
-        x += sx[idx];
-        y += sy[idx];
-    }
-    return temp;
-}
-int catch_people_re(){
-    int sx[4] = {1, 0, -1, 0};
-    int sy[4] = {0, -1, 0, 1};
-    int idx = rounds % 4;
-    int x = r, y = c;
-    int temp = 0;
-    for (int i = 0 ; i < 3 ; i++){
-        if (x < 1 && x > n && y < 1 && y > n)
-            continue;
-        if (tree[x][y])
-            continue;
-        for (int j = 0 ; j < 4 ; j++){
-            if(people[x][y][j] == 0)
-                continue;
-            temp += people[x][y][j];
-            people[x][y][j] = 0;
-        }
-        x += sx[idx];
-        y += sy[idx];
-    }
-    return temp;
-}
+
 // void print_people(){
-//     cout << "print_people==========\n";
 //     for (int i = 1 ; i <= n ; i++){
 //         for (int j = 1 ; j <= n ; j++){
 //             int sum = 0;
@@ -134,9 +84,64 @@ int catch_people_re(){
 //         cout << "\n";
 //     }
 // }
-// void print_rc(){
-//     cout << "print_r_c===============\n" << r << " " << c << "\n";
+// void print_tree(){
+//     for (int i = 1 ; i <= n ; i++){
+//         for (int j = 1 ; j <= n ; j++){
+//             cout << tree[i][j] << " ";
+//         }
+//         cout << "\n";
+//     }
 // }
+// void print_rc(){
+//     cout << "print_r_c=============== " << r << " " << c << "\n";
+// }
+void move_soolae(){
+    int tx[4] = {-1, 0, 1, 0};
+    int ty[4] = {0, 1, 0, -1};
+    int x = r;
+    int y = c;
+    if (is_rev == 0){
+        r += tx[turn[x][y]];
+        c += ty[turn[x][y]];
+    } else{
+        r += tx[rev_turn[x][y]];
+        c += ty[rev_turn[x][y]];
+    }
+    if(is_rev == 1 && r == (n+1) / 2 && c == (n+1) / 2){
+        is_rev = 0;
+    } else if (is_rev == 0 && r == 1 && c == 1){
+        is_rev = 1;
+    }
+}
+int catch_people(){
+    int tx[4] = {-1, 0, 1, 0};
+    int ty[4] = {0, 1, 0, -1};
+    int idx = 0;
+    if (is_rev == 0)
+        idx = turn[r][c];
+    else
+        idx = rev_turn[r][c];
+    int x = r, y = c;
+    int temp = 0;
+    for (int i = 0 ; i < 3 ; i++){
+        if (x < 1 && x > n && y < 1 && y > n)
+            continue;
+        if (tree[x][y]){
+            x += tx[idx];
+            y += ty[idx];
+            continue;
+        }
+        for (int j = 0 ; j < 4 ; j++){
+            if(people[x][y][j] == 0)
+                continue;
+            temp += people[x][y][j];
+            people[x][y][j] = 0;
+        }
+        x += tx[idx];
+        y += ty[idx];
+    }
+    return temp;
+}
 int main() {
     cin >> n >> m >> h >> k;
     for (int i = 0 ; i < m ; i++){
@@ -151,25 +156,14 @@ int main() {
     }
     r = (n+1) / 2;
     c = (n+1) / 2;
+    init_turn();
     for (int i = 1 ; i <= k ; i++){
         // print_people();
+        // print_tree();
+        // print_rc();
         move_people();
-        // print_people();
-        // print_rc();
-        if (flag){
-            move_soolae_re();
-        } else{
-            move_soolae();
-        }
-        // print_rc();
-        if (flag){
-            rounds--;
-            sum += catch_people_re() * i;
-        } else{
-            rounds++;
-            sum += catch_people() * i;
-        }
-        // print_people();
+        move_soolae();
+        sum += (catch_people() * i);
     }
     cout << sum;
     return 0;
