@@ -10,6 +10,7 @@
 using namespace std;
 int n, m, k;
 vector< vector<int> > map(20, vector<int>(20, 0));
+vector< vector<int> > team_num(20, vector<int>(20, -1));
 vector< vector< pair<int, int> > > teams(5, vector< pair<int, int> >(0));
 vector<int> tails(5, 0);
 int score = 0; 
@@ -18,6 +19,7 @@ int dy[4] = {1, 0, -1, 0};
 int indexx = 0;
 void init_team(int x, int y, vector< vector<int> > &visit, int idx){
     visit[x][y] = 1;
+    team_num[x][y] = idx;
     teams[idx].push_back(make_pair(x, y));
     for (int i = 0 ; i < 4 ; i++){
         int nx = x + dx[i];
@@ -55,26 +57,14 @@ void reverse_team(vector< pair<int, int> > &team, int idx){
         temp_team.push_back(team[i]);
     }
     team = temp_team;
-    for (int i = 0 ; i < team.size() ; i++){
-        if (i == 0)
-            map[team[i].first][team[i].second] = 1;
-        else if (i < tails[idx])
-            map[team[i].first][team[i].second] = 2;
-        else if (i == tails[idx])
-            map[team[i].first][team[i].second] = 3;
-        else
-            map[team[i].first][team[i].second] = 4;
-    }
 }
 void move_team(vector< pair<int, int> > &team, int idx){
     int x = 0, y = 0;
-    vector< pair<int, int> > temp_team;
     pair<int, int> last = team[team.size() - 1];
-    temp_team.push_back(last);
-    for (int i = 0 ; i < team.size() - 1 ; i++){
-        temp_team.push_back(team[i]);
+    for (int i = team.size() - 1 ; i >= 0 ; i--){
+        team[i] = team[i - 1];
     }
-    team = temp_team;
+    team[0] = last;
     for (int i = 0 ; i < team.size() ; i++){
         if (i == 0)
             map[team[i].first][team[i].second] = 1;
@@ -96,38 +86,68 @@ int throw_ball(int rounds){
     int idx = rounds % n;
     // cout << "throw_ball's round : " << way << " " << idx << "\n";
     int x = 0, y = 0;
-    int find = -1;
     if (way % 4 == 0){
         x = idx;
         y = 0;
+        for (int i = y ; y < n ; y++){
+            if (map[x][y] >= 1 && map [x][y] <= 3){
+                // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
+                for(int j = 0 ; j < teams[team_num[x][y]].size() ; j++){
+                    if(teams[team_num[x][y]][j].first == x && teams[team_num[x][y]][j].second == y){
+                        score += pow(j+1, 2);
+                        break;
+                    }
+                }
+                return team_num[x][y];
+            }
+        }
     } else if(way % 4 == 1){
         x = n - 1;
         y = idx;
+        for (int i = x ; i >= 0 ; i--){
+            if (map[x][y] >= 1 && map [x][y] <= 3){
+                // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
+                for(int j = 0 ; j < teams[team_num[x][y]].size() ; j++){
+                    if(teams[team_num[x][y]][j].first == x && teams[team_num[x][y]][j].second == y){
+                        score += pow(j+1, 2);
+                        break;
+                    }
+                }
+                return team_num[x][y];
+            }
+        }
     } else if (way % 4 == 2){
         x = n - 1 - idx;
         y = n - 1;
+        for (int i = y ; i >= 0 ; i--){
+            if (map[x][y] >= 1 && map [x][y] <= 3){
+                // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
+                for(int j = 0 ; j < teams[team_num[x][y]].size() ; j++){
+                    if(teams[team_num[x][y]][j].first == x && teams[team_num[x][y]][j].second == y){
+                        score += pow(j+1, 2);
+                        break;
+                    }
+                }
+                return team_num[x][y];
+            }
+        }
     } else if (way % 4 == 3){
         x = 0;
         y = n - 1 - idx;
-    }
-    while(x >= 0 && x < n && y >= 0 && y < n){
-        if (map[x][y] >= 1 && map [x][y] <= 3){
-            // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
-            break;
-        }
-        x += dx[way];
-        y += dy[way];
-    }
-    for (int i = 0 ; i < indexx ; i++){
-        for (int j = 0 ; j < teams[i].size() ; j++){
-            if (teams[i][j].first == x && teams[i][j].second == y){
-                find = i;
-                score += pow(j+1, 2);
-                return find;
+        for (int i = x ; i < n ; i++){
+            if (map[x][y] >= 1 && map [x][y] <= 3){
+                // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
+                for(int j = 0 ; j < teams[team_num[x][y]].size() ; j++){
+                    if(teams[team_num[x][y]][j].first == x && teams[team_num[x][y]][j].second == y){
+                        score += pow(j+1, 2);
+                        break;
+                    }
+                }
+                return team_num[x][y];
             }
         }
     }
-    return find;
+    return -1;
 }
 // void print_teams(){
 //     cout << "==============print teams=============\n";
