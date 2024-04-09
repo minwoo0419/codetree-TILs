@@ -6,6 +6,7 @@
 #include <stack>
 #include <algorithm>
 #include <numeric>
+#include <cmath>
 using namespace std;
 int n, m, k;
 vector< vector<int> > map(20, vector<int>(20, 0));
