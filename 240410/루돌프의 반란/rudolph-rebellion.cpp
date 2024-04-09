@@ -51,6 +51,8 @@ void move_rudolf(){
     int idx = 0;
     int santa_idx = 0;
     for (int i = 1 ; i <= P ; i++){
+        if (santa[i].first == 0 && santa[i].second == 0)
+            continue;
         int temp_min = pow(Rx- santa[i].first, 2) + pow(Ry - santa[i].second, 2);
         if (temp_min < min){
             santa_idx = i;
@@ -65,6 +67,8 @@ void move_rudolf(){
             }
         }
     }
+    if (santa_idx == 0)
+        return ;
     for (int i = 0 ; i < 8 ; i++){
         int nx = Rx + dx[i];
         int ny = Ry + dy[i];
@@ -151,17 +155,6 @@ void move_santas(){
         if (santa_dead[i] > 0)
             continue;
         move_santa(i);
-    }
-}
-void print_santas(){
-    for (int i = 1 ; i <= N ; i++){
-        for(int j = 1 ; j <= N ; j++){
-            if (santa_map[i][j].empty())
-                cout << 0 << " ";
-            else
-                cout << santa_map[i][j][0] << " ";
-        }
-        cout << "\n";
     }
 }
 void plus_one(){
