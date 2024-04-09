@@ -27,7 +27,8 @@ void init_team(int x, int y, vector< vector<int> > &visit, int idx){
             continue;
         if (visit[nx][ny] || (map[nx][ny] == 0 || map[nx][ny] == 4))
             continue;
-        init_team(nx, ny, visit, idx);
+        if (map[nx][ny] <= map[x][y] + 1)
+            init_team(nx, ny, visit, idx);
     }
 }
 void init_teams(){
@@ -85,6 +86,7 @@ void move_teams(){
 int throw_ball(int rounds){
     int way = rounds / n;
     int idx = rounds % n;
+    // cout << "throw_ball's round : " << way << " " << idx << "\n";
     int x = 0, y = 0;
     int find = -1;
     if (way % 4 == 0){
@@ -102,6 +104,7 @@ int throw_ball(int rounds){
     }
     while(x >= 0 && x < n && y >= 0 && y < n){
         if (map[x][y] >= 1 && map [x][y] <= 3){
+            // cout << "맞은 사람 좌표 : " << x << " " << y << "\n";
             break;
         }
         x += dx[way];
@@ -144,11 +147,17 @@ int main() {
     }
     init_teams();
     for (int i = 0 ; i < k ; i++){
+        // cout << "\n=============실행==============\n";
+        // print_map();
         move_teams();
+        // print_map();
         int idx = throw_ball(i);
         if (idx >= 0){
+            // cout << "맞은 사람의 팀 : " << idx << "\n";
             reverse_team(teams[idx]);
         }
+        // print_map();
+        // print_score();
     }
     cout << accumulate(score.begin(), score.end(), 0);
     return 0;
