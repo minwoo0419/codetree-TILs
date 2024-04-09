@@ -50,28 +50,30 @@ void move_rudolf(){
     int min = 2 * pow(N, 2);
     int idx = 0;
     int santa_idx = 0;
+    for (int i = 1 ; i <= P ; i++){
+        int temp_min = pow(Rx- santa[i].first, 2) + pow(Ry - santa[i].second, 2);
+        if (temp_min < min){
+            santa_idx = i;
+            min = temp_min;
+        } else if (temp_min == min){
+            if (santa[santa_idx].first < santa[i].first){
+                santa_idx = i;
+            } else if(santa[santa_idx].first == santa[i].first){
+                if (santa[santa_idx].second < santa[i].second){
+                    santa_idx = i;
+                }
+            }
+        }
+    }
     for (int i = 0 ; i < 8 ; i++){
         int nx = Rx + dx[i];
         int ny = Ry + dy[i];
         if (nx < 1 || nx > N || ny < 1 || ny > N)
             continue;
-        for (int j = 1 ; j <= P ; j++){
-            int temp_min = pow(nx - santa[j].first, 2) + pow(ny - santa[j].second, 2);
-            if (temp_min < min){
-                idx = i;
-                santa_idx = j;
-                min = temp_min;
-            } else if (temp_min == min){
-                if (santa[santa_idx].first < santa[j].first){
-                    idx = i;
-                    santa_idx = j;
-                } else if(santa[santa_idx].first == santa[j].first){
-                    if (santa[santa_idx].second < santa[j].second){
-                        idx = i;
-                        santa_idx = j;
-                    }
-                }
-            }
+        int temp_min = pow(nx - santa[santa_idx].first, 2) + pow(ny - santa[santa_idx].second, 2);
+        if (temp_min < min){
+            idx = i;
+            min = temp_min;
         }
     }
     Rx += dx[idx];
@@ -149,6 +151,17 @@ void move_santas(){
         if (santa_dead[i] > 0)
             continue;
         move_santa(i);
+    }
+}
+void print_santas(){
+    for (int i = 1 ; i <= N ; i++){
+        for(int j = 1 ; j <= N ; j++){
+            if (santa_map[i][j].empty())
+                cout << 0 << " ";
+            else
+                cout << santa_map[i][j][0] << " ";
+        }
+        cout << "\n";
     }
 }
 void plus_one(){
