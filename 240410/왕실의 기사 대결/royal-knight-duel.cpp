@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <queue>
 using namespace std;
+// #include <bits/stdc++.h>
 int L, N, Q;
 vector< vector<int> > map(41, vector<int>(41, 0));
 vector< vector<int> > knight(31, vector<int>(5, 0));
@@ -153,7 +154,7 @@ void move_knight(int idx, int d){
 }
 void check_dead(){
     for (int i = 1 ; i <= N ; i++){
-        if (knight[i][4] == damage[i]){
+        if (knight[i][4] <= damage[i]){
             knight[i][0] = 0;
             knight[i][1] = 0;
             damage[i] = 0;
