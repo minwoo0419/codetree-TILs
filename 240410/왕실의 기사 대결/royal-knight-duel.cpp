@@ -19,13 +19,7 @@ vector<int> check_move(int idx, int d){
     vector< vector<int> > visit(41, vector<int>(41, 0));
     vector<int> knight_visit(31, 0);
     queue< pair<int, int> > q;
-    knight_visit[idx] = 1;
-    for (int i = tx ; i < tx + knight[idx][2] ; i++){
-        for (int j = ty ; j < ty + knight[idx][3] ; j++){
-            q.push(make_pair(i, j));
-            visit[i][j] = 1;
-        }
-    }
+    q.push(make_pair(knight[idx][0], knight[idx][1]));
     while(!q.empty()){
         int x = q.front().first;
         int y = q.front().second;
@@ -42,28 +36,22 @@ vector<int> check_move(int idx, int d){
             knight_visit.clear();
             return knight_visit;
         }
-        if (knight_map[x][y] == idx){
-            if (visit[nx][ny] == 0 && knight_map[nx][ny] != 0 && knight_map[nx][ny] != idx){
-                visit[nx][ny] = 1;
-                knight_visit[knight_map[nx][ny]] = 1;
-                q.push(make_pair(nx, ny));
+        for (int i = 0 ; i < 4 ; i++){
+            int td = (d + 2 > 3) ? d - 2 : d + 2;
+            if (i == td)
+                continue;
+            int tx = x + dx[i];
+            int ty = y + dy[i];
+            if (tx < 1 || tx > L || ty < 1 || ty > L)
+                continue;
+            if (knight_map[tx][ty] == 0)
+                continue;
+            if (i != d){
+                if (knight_map[x][y] != knight_map[tx][ty])
+                    continue;
             }
-        } else{
-            for (int i = 0 ; i < 4 ; i++){
-                int td = (d + 2 > 3) ? d - 2 : d + 2;
-                if (td == i)
-                    continue;
-                int qx = x + dx[i];
-                int qy = y + dy[i];;
-                if (qx < 1 || qx > L || qy < 1 || qy > L)
-                    continue;
-                if (knight_map[qx][qy] == 0)
-                    continue;
-                if (visit[qx][qy] == 0){
-                    q.push(make_pair(qx, qy));
-                    visit[qx][qy] = 1;
-                    knight_visit[knight_map[qx][qy]] = 1;
-                }
+            if (visit[tx][ty] == 0){
+                q.push(make_pair(tx, ty));
             }
         }
     }
