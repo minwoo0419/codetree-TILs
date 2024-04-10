@@ -13,28 +13,26 @@ vector<int> damage(31, 0);
 vector< pair<int, int> > command(0);
 int dx[4] = {-1, 0, 1, 0};
 int dy[4] = {0, 1, 0, -1};
-vector<int> check_move(int idx, int d){
+vector<int> check_move(int idx, int d, vector< vector<int> > visits, vector<int> knight_visits){
     int tx = knight[idx][0];
     int ty = knight[idx][1];
-    vector< vector<int> > visit(41, vector<int>(41, 0));
-    vector<int> knight_visit(31, 0);
     queue< pair<int, int> > q;
     q.push(make_pair(knight[idx][0], knight[idx][1]));
     while(!q.empty()){
         int x = q.front().first;
         int y = q.front().second;
         q.pop();
-        visit[x][y] = 1;
-        knight_visit[knight_map[x][y]] = 1;
+        visits[x][y] = 1;
+        knight_visits[knight_map[x][y]] = 1;
         int nx = x + dx[d];
         int ny = y + dy[d];
         if (nx < 1 || nx > L || ny < 1 || ny > L){
-            knight_visit.clear();
-            return knight_visit;
+            knight_visits.clear();
+            return knight_visits;
         }
         if (map[nx][ny] == 2){
-            knight_visit.clear();
-            return knight_visit;
+            knight_visits.clear();
+            return knight_visits;
         }
         for (int i = 0 ; i < 4 ; i++){
             int td = (d + 2 > 3) ? d - 2 : d + 2;
@@ -50,26 +48,26 @@ vector<int> check_move(int idx, int d){
                 if (knight_map[x][y] != knight_map[tx][ty])
                     continue;
             }
-            if (visit[tx][ty] == 0){
+            if (visits[tx][ty] == 0){
                 q.push(make_pair(tx, ty));
             }
         }
     }
-    return knight_visit;
+    return knight_visits;
 }
-void check_trap(int idx, vector<int> knight_visit){
+void check_trap(int idx, vector<int> knight_visits){
     for (int i = 1 ; i <= L ; i++){
         for (int j = 1 ; j <= L ; j++){
             if (knight_map[i][j] == 0)
                 continue;
-            if (knight_map[i][j] != idx && map[i][j] == 1 && knight_visit[knight_map[i][j]] == 1){
+            if (knight_map[i][j] != idx && map[i][j] == 1 && knight_visits[knight_map[i][j]] == 1){
                 damage[knight_map[i][j]] += 1;
             }
         }
     }
 }
-void move_knight(int idx, int d){
-    vector<int> can_move = check_move(idx, d);
+void move_knight(int idx, int d, vector< vector<int> > visits, vector<int> knight_visits ){
+    vector<int> can_move = check_move(idx, d, visits, knight_visits);
     if (can_move.empty())
         return;
     if (d == 0){
@@ -165,6 +163,8 @@ void print_map(){
     }
 }
 int main() {
+    vector< vector<int> > visits(41, vector<int>(41, 0));
+    vector<int> knight_visits(31, 0);
     cin >> L >> N >> Q;
     for (int i = 1 ; i <= L ; i++){
         for (int j = 1 ; j <= L ; j++){
@@ -191,7 +191,7 @@ int main() {
         int d = command[i].second;
         if (knight[idx][0] == 0 && knight[idx][1] == 0)
             continue;
-        move_knight(idx, d);
+        move_knight(idx, d, visits, knight_visits);
         check_dead();
     }
     // print_map();
